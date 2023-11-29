@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Cricket Scorecard</title>
+</head>
+<body>
+
+<div class="container mt-4">
+    <h2>Cricket Scorecard</h2>
+
+ <div id="scorecard" class="mt-4">
+    </div>
+
+
+    <form id="scoreForm">
+        <!-- Team Score Row -->
+        <div class="row mb-3">
+            <div class="col-3">
+                <label for="team">Team:</label>
+                <input type="text" class="form-control" id="team" placeholder="Team" required>
+            </div>
+            <div class="col-3">
+                <label for="runs">Runs:</label>
+                <input type="number" class="form-control" id="runs" placeholder="Runs" required>
+            </div>
+            <div class="col-3">
+                <label for="wickets">WK:</label>
+                <input type="number" class="form-control" id="wickets" placeholder="Wickets" required>
+            </div>
+            <div class="col-3">
+                <label for="overs">Overs:</label>
+                <input type="number" class="form-control" id="overs" step="0.1" placeholder="Overs" required>
+            </div>
+        </div>
+
+        <!-- Batsman 1 Details Row -->
+        <div class="row mb-3">
+            <div class="col-6">
+                <label for="batsman1Name">Batr 1:</label>
+                <input type="text" class="form-control" id="batsman1Name" placeholder="Batsman 1 Name" required>
+            </div>
+            <div class="col-3">
+                <label for="batsman1Runs">Runs:</label>
+                <input type="number" class="form-control" id="batsman1Runs" placeholder="Runs" required>
+            </div>
+            <div class="col-3">
+                <label for="ballsFaced1">Balls:</label>
+                <input type="number" class="form-control" id="ballsFaced1" placeholder="Balls Faced" required>
+            </div>
+            <div class="col-12 mt-2">
+                <button type="button" class="btn btn-success" onclick="updateBatsmanScore('batsman1Runs', 0)">0</button>
+                <button type="button" class="btn btn-success" onclick="updateBatsmanScore('batsman1Runs', 1)">1</button>
+                <button type="button" class="btn btn-success" onclick="updateBatsmanScore('batsman1Runs', 2)">2</button>
+                <button type="button" class="btn btn-success" onclick="updateBatsmanScore('batsman1Runs', 3)">3</button>
+                <button type="button" class="btn btn-success" onclick="updateBatsmanScore('batsman1Runs', 4)">4</button>
+                <button type="button" class="btn btn-success" onclick="updateBatsmanScore('batsman1Runs', 6)">6</button>
+                <button type="button" class="btn btn-danger" onclick="outBatsman('batsman1Name', 'batsman1Runs', 'ballsFaced1')">Out</button>
+            </div>
+        </div>
+
+        <!-- Batsman 2 Details Row -->
+        <div class="row mb-3">
+            <div class="col-6">
+                 <label for="batsman2Name">Batr 2:</label>
+                <input type="text" class="form-control" id="batsman2Name" placeholder="Batsman 2 Name" required>
+            </div>
+            <div class="col-3">
+                <label for="batsman2Runs">Runs:</label>
+                <input type="number" class="form-control" id="batsman2Runs" placeholder="Runs" required>
+            </div>
+            <div class="col-3">
+                <label for="ballsFaced2">Balls:</label>
+                <input type="number" class="form-control" id="ballsFaced2" placeholder="Balls Faced" required>
+            </div>
+            <div class="col-12 mt-2">
+                <button type="button" class="btn btn-success" onclick="updateBatsmanScore('batsman2Runs', 0)">0</button>
+                <button type="button" class="btn btn-success" onclick="updateBatsmanScore('batsman2Runs', 1)">1</button>
+                <button type="button" class="btn btn-success" onclick="updateBatsmanScore('batsman2Runs', 2)">2</button>
+                <button type="button" class="btn btn-success" onclick="updateBatsmanScore('batsman2Runs', 3)">3</button>
+                <button type="button" class="btn btn-success" onclick="updateBatsmanScore('batsman2Runs', 4)">4</button>
+                <button type="button" class="btn btn-success" onclick="updateBatsmanScore('batsman2Runs', 6)">6</button>
+                <button type="button" class="btn btn-danger" onclick="outBatsman('batsman2Name', 'batsman2Runs', 'ballsFaced2')">Out</button>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="updateScore()">Update Score</button>
+        <button type="button" class="btn btn-success" onclick="saveScore()">Save Score</button>
+<button type="button" class="btn btn-warning" onclick="resetForm()">Reset</button>
+
+        
+    </form>
+
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script>
+    
+    const socket = io('ws://localhost:8080');
+    
+    
+        function updateScore() {
+            var team = document.getElementById('team').value;
+            var runs = document.getElementById('runs').value;
+            var wickets = document.getElementById('wickets').value;
+            var overs = document.getElementById('overs').value;
+
+            var batsman1Name = document.getElementById('batsman1Name').value;
+            var batsman1Runs = document.getElementById('batsman1Runs').value;
+            var ballsFaced1 = document.getElementById('ballsFaced1').value;
+
+            var batsman2Name = document.getElementById('batsman2Name').value;
+            
+            var batsman2Runs = document.getElementById('batsman2Runs').value;
+            var ballsFaced2 = document.getElementById('ballsFaced2').value;
+
+            var scorecard = document.getElementById('scorecard');
+            scorecard.innerHTML = team + ' ' + runs + '/' + wickets + '(' + overs + ')' + '<br>';
+            scorecard.innerHTML += batsman1Name + ' ' + batsman1Runs + '(' + ballsFaced1 + '), ' +
+                batsman2Name + ' ' + batsman2Runs + '(' + ballsFaced2 + ')';
+                
+                
+        saveScore();
+       let sc = localStorage.getItem('cricketScore');
+       console.log(sc)
+       
+       socket.emit('message', sc);
+
+       
+        }
+
+        function updateBatsmanScore(runsField, run) {
+            var batsmanRuns = document.getElementById(runsField);
+            batsmanRuns.value = parseInt(batsmanRuns.value) + run;
+            console.log(runsField)
+            if (runsField == 'batsman1Runs'){
+             document.getElementById('ballsFaced1').value = parseInt(document.getElementById('ballsFaced1').value) + 1;
+            }else{
+             document.getElementById('ballsFaced2').value = parseInt(document.getElementById('ballsFaced2').value) + 1;
+            }
+            
+            
+            
+            function ballsToOvers(balls) {
+    var overs = Math.floor(balls / 6); // Calculate the whole overs
+    var remainingBalls = balls % 6;    // Calculate the remaining balls
+
+    // Format the output as "overs.balls"
+    return overs + "." + remainingBalls;
+}
+
+            
+            
+            
+            function oversToBalls(overs) {
+    var oversArray = overs.toString().split('.'); // Split overs into whole overs and remaining balls
+    var wholeOvers = parseInt(oversArray[0]) * 6; // Convert whole overs to balls
+    var remainingBalls = oversArray[1] ? parseInt(oversArray[1]) : 0; // If there are remaining balls, convert them to integer, otherwise set to 0
+
+    return wholeOvers + remainingBalls;
+}
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            document.getElementById('overs').value = ballsToOvers(parseInt(oversToBalls(document.getElementById('overs').value)) + 1) ;
+            
+            
+            
+            updateTeamScore(run);
+            
+            
+            
+        }
+
+        function outBatsman(nameField, runsField, ballsFacedField) {
+            var batsmanName = document.getElementById(nameField);
+            var batsmanRuns = document.getElementById(runsField);
+            var ballsFaced = document.getElementById(ballsFacedField);
+
+            // Clear the form for the out batsman
+            batsmanName.value = '';
+            batsmanRuns.value = 0;
+            ballsFaced.value = 0;
+
+            // Increment wickets
+            var wickets = document.getElementById('wickets');
+            wickets.value = parseInt(wickets.value) + 1;
+
+            updateTeamScore();
+        }
+
+        function updateTeamScore(run) {
+            
+            if (run){
+            document.getElementById('runs').value = parseInt(document.getElementById('runs').value) + run ;
+}
+            updateScore();
+        }
+
+        function saveScore() {
+            var scoreData = {
+                team: document.getElementById('team').value,
+                runs: document.getElementById('runs').value,
+                wickets: document.getElementById('wickets').value,
+                overs: document.getElementById('overs').value,
+                batsman1: {
+                    name: document.getElementById('batsman1Name').value,
+                    runs: document.getElementById('batsman1Runs').value,
+                    ballsFaced: document.getElementById('ballsFaced1').value,
+                },
+                batsman2: {
+                    name: document.getElementById('batsman2Name').value,
+                    runs: document.getElementById('batsman2Runs').value,
+                    ballsFaced: document.getElementById('ballsFaced2').value,
+                }
+            };
+
+            localStorage.setItem('cricketScore', JSON.stringify(scoreData));
+           // alert('Score saved to local storage!');
+        }
+
+        // Load saved score on page load
+        window.onload = function () {
+            var savedScore = localStorage.getItem('cricketScore');
+            if (savedScore) {
+                var scoreData = JSON.parse(savedScore);
+                document.getElementById('team').value = scoreData.team;
+                document.getElementById('runs').value = scoreData.runs;
+                document.getElementById('wickets').value = scoreData.wickets;
+                document.getElementById('overs').value = scoreData.overs;
+                document.getElementById('batsman1Name').value = scoreData.batsman1.name;
+                document.getElementById('batsman1Runs').value = scoreData.batsman1.runs;
+                document.getElementById('ballsFaced1').value = scoreData.batsman1.ballsFaced;
+                document.getElementById('batsman2Name').value = scoreData.batsman2.name;
+                document.getElementById('batsman2Runs').value = scoreData.batsman2.runs;
+                document.getElementById('ballsFaced2').value = scoreData.batsman2.ballsFaced;
+                updateScore();
+            }
+        };
+        
+        
+        
+        
+function resetForm() {
+    // Ask for confirmation
+    var confirmReset = confirm('Are you sure you want to reset the form?');
+
+    if (confirmReset) {
+        // Clear form fields
+        document.getElementById('team').value = '';
+        document.getElementById('runs').value = '0';
+        document.getElementById('wickets').value = '0';
+        document.getElementById('overs').value = '0';
+        document.getElementById('batsman1Name').value = '';
+        document.getElementById('batsman1Runs').value = '0';
+        document.getElementById('ballsFaced1').value = '0';
+        document.getElementById('batsman2Name').value = '';
+        document.getElementById('batsman2Runs').value = '0';
+        document.getElementById('ballsFaced2').value = '0';
+
+        // Clear local storage
+        localStorage.removeItem('cricketScore');
+
+        
+        updateScore();
+        
+        
+    }
+}
+
+        
+        
+        
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   
+
+</body>
+</html>
