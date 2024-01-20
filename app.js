@@ -1,5 +1,6 @@
 const express = require('express');
-const https = require('https');
+var https = require('https');
+var http = require('http');
 const fs = require('fs');
 const path = require('path');
 const socketIO = require('socket.io');
@@ -25,7 +26,13 @@ const serverOptions = {
   cert: fs.readFileSync(certPath),
 };
 
-const server = https.createServer(serverOptions, app);
+if (process.env.PORT){
+ var server = http.createServer(serverOptions, app);
+} else {
+ var server = https.createServer(serverOptions, app);
+}
+
+
 const io = socketIO(server, {
   cors: { origin: "*" },
 });
@@ -39,12 +46,19 @@ io.on('connection', (socket) => {
   });
 });
 
-/*
-server.listen(process.env.PORT || 8080, '192.168.79.242' , () => {
-  console.log('Listening on https://192.168.79.242:8080');
-});
-*/
 
-server.listen(process.env.PORT || 8080, localIP, () => {
+
+if (process.env.PORT){
+ 
+ server.listen(process.env.PORT, () => {
+  console.log(`Listening on`);
+});
+ 
+}else{
+
+server.listen(8080, localIP, () => {
   console.log(`Listening on https://${localIP}:8080`);
 });
+ 
+ 
+}
