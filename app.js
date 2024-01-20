@@ -27,7 +27,7 @@ const serverOptions = {
 };
 
 if (process.env.PORT){
- var server = http.createServer(serverOptions, app);
+ var server = http.createServer(app);
 } else {
  var server = https.createServer(serverOptions, app);
 }
