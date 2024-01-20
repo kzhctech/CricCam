@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/bootstrap.min.css" rel="stylesheet">
     <title>Cricket Scorecard</title>
 </head>
 <body>
@@ -34,6 +34,17 @@
                 <label for="overs">Overs:</label>
                 <input type="number" class="form-control" id="overs" step="0.1" placeholder="Overs" required>
             </div>
+        </div>
+        
+        <div class="row mb-3">
+         <div class="col-12">
+          Extra:
+          <button type="button" onclick="updateTeamScore(1)" class="btn btn-success">1</button>
+           <button type="button" onclick="updateTeamScore(2)" class="btn btn-success">2</button>
+            <button type="button" onclick="updateTeamScore(3)" class="btn btn-success">3</button>
+             <button type="button" onclick="updateTeamScore(4)" class="btn btn-success">4</button>
+              <button type="button" onclick="updateTeamScore(5)" class="btn btn-success">5</button>
+         </div>
         </div>
 
         <!-- Batsman 1 Details Row -->
@@ -93,11 +104,18 @@
         
     </form>
 
- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+ <script src="/socket.io.js"></script>
     <script>
     
-    const socket = io('ws://localhost:8080');
+   // const socket = io('ws://localhost:8080');
     
+  //  const socket = io('https://192.168.0.100:8080/');
+    
+    
+    const currentHost = window.location.host;
+   // alert(currentHost);
+const socket = io(`https://${currentHost}/`);
+
     
         function updateScore() {
             var team = document.getElementById('team').value;
@@ -128,6 +146,8 @@
 
        
         }
+        
+        
 
         function updateBatsmanScore(runsField, run) {
             var batsmanRuns = document.getElementById(runsField);
